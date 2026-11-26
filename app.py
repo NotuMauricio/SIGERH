@@ -4,8 +4,9 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
+import base64
 
-st.set_page_config(page_title="SIGERH | Panel experimental", page_icon="🏠", layout="wide")
+st.set_page_config(page_title="SIGERH v13 | Centro de análisis", page_icon="🏠", layout="wide")
 st.markdown("""<style>
 /* SIGERH v6: paleta accesible, sin reglas globales que oculten textos */
 :root { --vino:#760E30; --vino-profundo:#600D2A; --hueso:#F8F3EA; --texto:#29252A; --verde:#83B796; }
@@ -39,7 +40,7 @@ st.markdown("""<style>
 [data-testid="stSidebar"] [data-baseweb="select"] svg {fill:#760E30 !important;color:#760E30 !important;}
 /* Inputs deshabilitados: legibles */
 [data-testid="stSidebar"] input:disabled {opacity:1 !important;color:#4C3B43 !important;-webkit-text-fill-color:#4C3B43 !important;}
-/* Pestañas */
+/* Pestañas heredadas (no utilizadas en v11) */
 [data-testid="stTabs"] [data-baseweb="tab-list"] {gap:10px;border-bottom:1px solid #DCCBC5;}
 [data-testid="stTabs"] button[data-baseweb="tab"] {color:#4D2535 !important;font-weight:650 !important;opacity:1 !important;}
 [data-testid="stTabs"] button[data-baseweb="tab"] p,
@@ -65,7 +66,180 @@ st.markdown("""<style>
 .sigerh-header h1 {margin:0 0 6px;color:#760E30 !important;font-size:2.2rem;}
 .sigerh-header p {color:#624851 !important;margin:0;font-size:.95rem;}
 </style>""", unsafe_allow_html=True)
-st.markdown("""<div class="sigerh-header"><h1>🏠 SIGERH | Centro de análisis hipotecario</h1><p>Sistema de Gestión y Predicción del Riesgo Hipotecario · Prototipo académico · Ciudad de México</p></div>""", unsafe_allow_html=True)
+st.markdown("""<style>
+/* SIGERH v10: controles accesibles y presentación consistente */
+[data-testid="stTabs"] [data-baseweb="tab-list"] {overflow-x:auto;scrollbar-width:thin;}
+[data-testid="stTabs"] button[data-baseweb="tab"] {white-space:nowrap;background:transparent !important;color:#542337 !important;}
+[data-testid="stTabs"] button[data-baseweb="tab"] * {color:inherit !important;}
+[data-testid="stMain"] [data-testid="stWidgetLabel"] p {color:#392D33 !important;}
+[data-testid="stSidebar"] [data-baseweb="select"] > div {background:#FFFDF9 !important;color:#29252A !important;}
+[data-testid="stSidebar"] [data-baseweb="select"] [role="combobox"] {color:#29252A !important;}
+[data-testid="stMain"] [data-testid="stDataFrame"] {background:#FFFDF9 !important;}
+[data-testid="stMain"] .stButton button,[data-testid="stMain"] .stDownloadButton button {background:#760E30 !important;color:white !important;border:1px solid #760E30 !important;}
+[data-testid="stMain"] .stButton button p,[data-testid="stMain"] .stDownloadButton button p {color:white !important;}
+[data-testid="stMain"] [data-testid="stMetric"] {min-height:112px;}
+</style>""",unsafe_allow_html=True)
+
+# Corrección visual del chatbot: contraste explícito en temas claro/oscuro.
+st.markdown('''<style>
+[data-testid="stMain"] [data-testid="stChatMessage"] {
+    background:#FFFFFF !important;
+    border:1px solid #E6D5D2 !important;
+    border-radius:14px !important;
+    padding:1rem !important;
+    margin-bottom:.7rem !important;
+    box-shadow:0 2px 7px rgba(65,20,35,.05);
+}
+[data-testid="stMain"] [data-testid="stChatMessage"] p,
+[data-testid="stMain"] [data-testid="stChatMessage"] li,
+[data-testid="stMain"] [data-testid="stChatMessage"] span,
+[data-testid="stMain"] [data-testid="stChatMessage"] div[data-testid="stMarkdownContainer"] {
+    color:#29252A !important;
+    opacity:1 !important;
+}
+[data-testid="stMain"] [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+    background:#F4DFE5 !important;
+}
+[data-testid="stMain"] [data-testid="stChatInput"],
+[data-testid="stChatInput"] {
+    background:#FFFDF9 !important;
+    border:1px solid #A85D76 !important;
+    border-radius:12px !important;
+}
+[data-testid="stChatInput"] textarea,
+[data-testid="stChatInput"] textarea::placeholder {
+    color:#29252A !important;
+    -webkit-text-fill-color:#29252A !important;
+    opacity:1 !important;
+}
+[data-testid="stChatInput"] button {
+    background:#760E30 !important;
+    color:#FFFFFF !important;
+}
+[data-testid="stChatInput"] button svg {color:#FFFFFF !important;}
+[data-testid="stMain"] .stButton button:disabled,
+[data-testid="stMain"] .stButton button:disabled p {
+    color:#FFFFFF !important;
+    opacity:.7 !important;
+}
+</style>''', unsafe_allow_html=True)
+
+
+# Contraste del chat y botones, incluidos portales de Streamlit fuera de stMain.
+st.markdown("""<style>
+[data-testid="stBottom"], [data-testid="stBottomBlockContainer"],
+[data-testid="stBottom"] > div, [data-testid="stChatInputContainer"] {
+  background:#F8F3EA !important;
+}
+[data-testid="stChatInput"], [data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] [data-baseweb="textarea"],
+[data-testid="stChatInput"] [data-baseweb="base-input"],
+[data-testid="stChatInput"] textarea {
+  background:#FFFFFF !important; color:#252027 !important;
+  -webkit-text-fill-color:#252027 !important;
+}
+[data-testid="stChatInput"] textarea::placeholder {
+  color:#665A60 !important; -webkit-text-fill-color:#665A60 !important;
+  opacity:1 !important;
+}
+[data-testid="stChatInput"] button {background:#760E30 !important;}
+[data-testid="stChatInput"] button svg {color:white !important;fill:none !important;}
+[data-testid="stChatMessage"], [data-testid="stChatMessage"] > div {
+  background:#FFFFFF !important; color:#29252A !important;
+}
+[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] span,
+[data-testid="stChatMessage"] li {
+  color:#29252A !important; opacity:1 !important;
+}
+[data-testid="stMain"] div.stButton > button,
+[data-testid="stMain"] [data-testid="stBaseButton-secondary"],
+[data-testid="stMain"] [data-testid="stBaseButton-primary"] {
+  background:#760E30 !important; border-color:#760E30 !important;
+  color:#FFFFFF !important; opacity:1 !important;
+}
+[data-testid="stMain"] div.stButton > button *,
+[data-testid="stMain"] [data-testid="stBaseButton-secondary"] *,
+[data-testid="stMain"] [data-testid="stBaseButton-primary"] * {
+  color:#FFFFFF !important; -webkit-text-fill-color:#FFFFFF !important;
+  opacity:1 !important;
+}
+</style>""",unsafe_allow_html=True)
+
+
+# SIGERH v14: tema claro para widgets del clasificador y simulador.
+st.markdown("""<style>
+/* Campos numericos y sus controles +/- */
+[data-testid="stMain"] [data-testid="stNumberInput"] [data-baseweb="input"],
+[data-testid="stMain"] [data-testid="stNumberInput"] [data-baseweb="base-input"],
+[data-testid="stMain"] [data-testid="stNumberInput"] input,
+[data-testid="stMain"] [data-testid="stNumberInput"] button,
+[data-testid="stMain"] [data-testid="stNumberInput"] > div {
+ background-color:#FFFDF9 !important;color:#29252A !important;
+ border-color:#D8BFC5 !important;
+}
+[data-testid="stMain"] [data-testid="stNumberInput"] input {
+ -webkit-text-fill-color:#29252A !important; opacity:1 !important;
+}
+[data-testid="stMain"] [data-testid="stNumberInput"] button svg {
+ color:#760E30 !important;fill:none !important;
+}
+/* Radios del simulador y su texto */
+[data-testid="stMain"] [data-testid="stRadio"] label,
+[data-testid="stMain"] [data-testid="stRadio"] label p,
+[data-testid="stMain"] [data-testid="stRadio"] label span,
+[data-testid="stMain"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+ color:#29252A !important;-webkit-text-fill-color:#29252A !important;opacity:1 !important;
+}
+/* Tablas Streamlit: encabezados y bordes; el tema light controla el canvas */
+[data-testid="stMain"] [data-testid="stDataFrame"] {
+ background:#FFFFFF !important;color:#29252A !important;
+ border:1px solid #E5D5D0 !important;
+}
+/* Selects y sliders del simulador */
+[data-testid="stMain"] [data-baseweb="select"] > div {
+ background:#FFFDF9 !important;color:#29252A !important;
+}
+[data-testid="stMain"] [data-testid="stSlider"] p,
+[data-testid="stMain"] [data-testid="stSlider"] span {
+ color:#29252A !important;opacity:1 !important;
+}
+</style>""",unsafe_allow_html=True)
+
+# Identidad visual institucional SIGERH v12.
+# Se utilizan imágenes locales, sin depender de servicios externos.
+BASE_DIR = Path(__file__).resolve().parent
+ASSETS_DIR = BASE_DIR / "assets"
+
+def imagen_base64(ruta):
+    if not ruta.is_file():
+        return None
+    return base64.b64encode(ruta.read_bytes()).decode("ascii")
+
+logo_b64 = imagen_base64(ASSETS_DIR / "logo_sigerh.png")
+portada_b64 = imagen_base64(ASSETS_DIR / "portada_sigerh.png")
+logo_html = (f'<img class="sigerh-logo" src="data:image/png;base64,{logo_b64}" alt="Logotipo de SIGERH">' if logo_b64 else '<span class="sigerh-logo-fallback">🏠</span>')
+st.markdown("""<style>
+.sigerh-brand {display:flex;align-items:center;gap:22px;padding:18px 24px;background:#FFFDF9;
+ border:1px solid #EAD7D0;border-radius:16px;margin:4px 0 15px;box-shadow:0 4px 16px #4422190B;}
+.sigerh-logo {width:94px;height:94px;object-fit:contain;flex-shrink:0;border-radius:12px;}
+.sigerh-logo-fallback {font-size:3rem;}
+.sigerh-brand-title {color:#760E30;font-size:clamp(1.5rem,2.4vw,2.35rem);font-weight:750;line-height:1.2;margin:0 0 8px;}
+.sigerh-brand-subtitle {color:#51414A;font-size:.96rem;line-height:1.5;margin:0;}
+.sigerh-cover {height:220px;border-radius:16px;background-size:cover;background-position:center 57%;
+ border:1px solid #EAD7D0;margin:0 0 18px;position:relative;overflow:hidden;}
+.sigerh-cover-label {position:absolute;bottom:15px;left:18px;background:rgba(91,12,39,.9);
+ color:white!important;padding:9px 16px;border-radius:9px;font-weight:650;letter-spacing:.01em;}
+@media(max-width:700px){.sigerh-brand{gap:12px;padding:14px;}.sigerh-logo{width:65px;height:65px;}
+ .sigerh-cover{height:150px;}.sigerh-cover-label{font-size:.8rem;}}
+</style>""",unsafe_allow_html=True)
+st.markdown(f'''<div class="sigerh-brand">{logo_html}<div>
+<div class="sigerh-brand-title">SIGERH | Centro de análisis hipotecario</div>
+<p class="sigerh-brand-subtitle">Sistema de Gestión y Predicción del Riesgo Hipotecario · Prototipo académico · Ciudad de México</p>
+</div></div>''',unsafe_allow_html=True)
+if portada_b64:
+    st.markdown(f'''<div class="sigerh-cover" role="img" aria-label="Ilustración institucional de vivienda urbana" style="background-image:url(data:image/png;base64,{portada_b64})">
+    <span class="sigerh-cover-label">Análisis de cartera hipotecaria · Ciudad de México</span></div>''',unsafe_allow_html=True)
+
 st.info("SIGERH integra una cartera de 100,000 registros simulados. Las clasificaciones del MPRH son experimentales y no equivalen a predicciones validadas con créditos reales.")
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -147,6 +321,18 @@ except Exception as e:
     st.stop()
 
 with st.sidebar:
+    st.markdown("### Navegación")
+    areas = {
+        "🏛️ Panel principal": ["Inicio ejecutivo", "Resumen MPRH"],
+        "🗂️ Gestión de cartera": ["Cartera completa", "Explorador", "Ficha de crédito"],
+        "📊 Análisis financiero y territorial": ["Análisis por alcaldía", "Análisis financiero"],
+        "🔄 Evaluación experimental": ["Comparación de escenarios", "Seguimiento individual"],
+        "🤖 Asistente y herramientas inteligentes": ["Chatbot hipotecario", "Clasificador experimental", "Simulador financiero"],
+        "📖 Documentación": ["Metodología"],
+    }
+    area = st.selectbox("Área de trabajo", list(areas), key="area_navegacion")
+    pagina = st.radio("Apartado", areas[area], key="pagina_navegacion")
+    st.divider()
     st.header("Filtros de cartera")
     escenario = st.radio("Escenario", ["variable", "persistente"], format_func=str.title)
     conjunto = st.selectbox("Conjunto", ["validacion", "prueba"], format_func=str.title)
@@ -166,7 +352,9 @@ with st.sidebar:
 
 st.info(f"Cartera general: {original_count:,} registros. MPRH: {all_data[all_data.escenario==escenario].id_credito.nunique():,} créditos con clasificaciones de validación o prueba. Conjunto predictivo seleccionado: {conjunto}.")
 st.caption("Los niveles Bajo, Medio y Alto son percentiles de puntuaciones de validación, no categorías de riesgo real.")
-t0,t1,t2,t3,t4,t5,t6,t7 = st.tabs(["🗂️ Cartera completa", "📊 Resumen MPRH", "🔎 Explorador", "🏠 Ficha de crédito", "🗺️ Análisis por alcaldía", "💰 Análisis financiero", "🔄 Comparación de escenarios", "📖 Metodología"])
+st.caption(f"**Área:** {area}  ·  **Apartado:** {pagina}")
+# Cada apartado se dibuja únicamente cuando se selecciona en la navegación lateral.
+# Evita las diez pestañas horizontales y mantiene los módulos existentes.
 # La cartera se carga por separado para no confundirla con los resultados de evaluación.
 @st.cache_data(show_spinner="Cargando cartera hipotecaria completa...")
 def cargar_cartera_completa(ruta):
@@ -175,7 +363,91 @@ def cargar_cartera_completa(ruta):
         raise ValueError("La cartera completa debe tener identificadores únicos y no nulos")
     return df
 
-with t0:
+if pagina == 'Inicio ejecutivo':
+    st.subheader("Panorama ejecutivo de la cartera hipotecaria")
+    st.caption("Indicadores descriptivos y resultados experimentales. Las cifras históricas no cambian con los filtros MPRH.")
+    a,b,c,e = st.columns(4)
+    a.metric("Registros originales", f"{original_count:,}")
+    b.metric("Elegibles documentados", "56,449" if original_count == 100000 else "No verificado")
+    c.metric("Excluidos documentados", "43,551" if original_count == 100000 else "No verificado")
+    e.metric("Créditos filtrados MPRH", f"{len(d):,}")
+    izquierda,derecha = st.columns(2)
+    with izquierda:
+        st.markdown("#### Composición histórica")
+        if original_count == 100000:
+            fig = go.Figure(go.Pie(labels=["Elegibles", "Excluidos"],values=[56449,43551],hole=.58,
+                marker=dict(colors=["#83B796","#BD5262"]),textinfo="label+percent"))
+            preparar_figura(fig,altura=320)
+            fig.update_layout(showlegend=False,margin=dict(l=5,r=5,t=5,b=5))
+            st.plotly_chart(fig,use_container_width=True)
+        else:
+            st.info("No se puede aplicar la composición histórica a otra cartera sin verificar la cohorte.")
+    with derecha:
+        st.markdown("#### Niveles experimentales de la selección")
+        if not d.empty:
+            counts=d.nivel_experimental.value_counts().reindex(["Bajo","Medio","Alto"],fill_value=0)
+            fig=go.Figure(go.Bar(x=counts.index,y=counts.values,
+                marker_color=[COLOR_NIVEL[k] for k in counts.index],text=counts.values,textposition="outside"))
+            preparar_figura(fig,altura=320)
+            fig.update_layout(showlegend=False,margin=dict(l=10,r=15,t=12,b=35))
+            st.plotly_chart(fig,use_container_width=True)
+        else:
+            st.info("No hay créditos para los filtros actuales.")
+    st.markdown("#### Lectura del conjunto filtrado")
+    if not d.empty:
+        k1,k2,k3=st.columns(3)
+        k1.metric("Eventos simulados",f"{int(d.etiqueta_simulada.sum()):,}")
+        k2.metric("Frecuencia simulada",f"{d.etiqueta_simulada.mean():.2%}")
+        k3.metric("Puntuación media experimental",f"{d.puntuacion_experimental.mean():.3f}")
+        g1,g2=st.columns(2)
+        with g1:
+            st.markdown("##### Créditos por alcaldía")
+            por_alc=d.groupby("alcaldia").size().nlargest(10).sort_values()
+            fig=go.Figure(go.Bar(x=por_alc.values,y=por_alc.index,orientation="h",marker_color=VINO))
+            preparar_figura(fig,altura=365,horizontal=True)
+            st.plotly_chart(fig,use_container_width=True)
+        with g2:
+            st.markdown("##### Carga de pago registrada")
+            valores=pd.to_numeric(d.carga_pago_pct,errors="coerce").dropna()
+            if len(valores):
+                fig=go.Figure(go.Histogram(x=valores,nbinsx=25,marker_color=VERDE))
+                preparar_figura(fig,altura=365)
+                fig.update_xaxes(title="Carga de pago (%)")
+                st.plotly_chart(fig,use_container_width=True)
+            else: st.info("No hay valores de carga de pago disponibles.")
+    st.markdown("#### Interpretación automática de la selección")
+    if d.empty:
+        st.info("No hay registros para interpretar. Modifica los filtros de cartera.")
+    else:
+        total = len(d)
+        nivel_c = d.nivel_experimental.value_counts().reindex(["Bajo", "Medio", "Alto"], fill_value=0)
+        predominante = nivel_c.idxmax()
+        alto = int(nivel_c["Alto"])
+        eventos = int(d.etiqueta_simulada.sum())
+        frecuencia = eventos / total * 100
+        alcaldia_c = d.alcaldia.value_counts(dropna=True)
+        texto_alcaldia = (f"La alcaldía con más registros en la selección es **{alcaldia_c.index[0]}**, "
+                          f"con **{int(alcaldia_c.iloc[0]):,} créditos** ({alcaldia_c.iloc[0]/total:.1%} del total filtrado). "
+                          "Este volumen no implica una mayor proporción de nivel Alto.") if not alcaldia_c.empty else "No hay alcaldías disponibles en la selección."
+        st.markdown(f"""En el escenario **{escenario.title()}**, conjunto **{conjunto.title()}**, los filtros actuales muestran **{total:,} créditos**.
+
+- El nivel experimental más frecuente es **{predominante}**, con **{int(nivel_c[predominante]):,} créditos** ({nivel_c[predominante]/total:.1%}).
+- **{alto:,} créditos** ({alto/total:.1%}) están clasificados en el nivel experimental Alto.
+- Se registran **{eventos:,} eventos simulados**, equivalentes al **{frecuencia:.2f}%** de la selección.
+- {texto_alcaldia}
+""")
+        st.caption("Interpretación descriptiva generada mediante reglas y cálculos de Pandas; no utiliza IA generativa, no estima causalidad ni convierte puntuaciones en probabilidades reales.")
+        reporte = pd.DataFrame([{"escenario":escenario,"conjunto":conjunto,"creditos_filtrados":total,
+            "nivel_predominante":predominante,"creditos_nivel_alto":alto,"porcentaje_nivel_alto":round(100*alto/total,2),
+            "eventos_simulados":eventos,"frecuencia_simulada_pct":round(frecuencia,2),
+            "alcaldias_filtradas":"; ".join(alcaldias),"instituciones_filtradas":"; ".join(instituciones),
+            "niveles_filtrados":"; ".join(niveles),"busqueda_id":search}])
+        st.download_button("Descargar indicadores ejecutivos (CSV)",
+            data=reporte.to_csv(index=False).encode("utf-8-sig"),
+            file_name=f"SIGERH_resumen_ejecutivo_{escenario}_{conjunto}.csv",mime="text/csv",key="descarga_ejecutivo_v13")
+    st.info("Los niveles se definen por percentiles experimentales y no son probabilidades reales de incumplimiento. La muestra MPRH corresponde al escenario, conjunto y filtros seleccionados.")
+
+if pagina == 'Cartera completa':
     st.subheader("Gestión y consulta de la cartera hipotecaria completa")
     st.caption("Vista descriptiva de la base simulada original. Los filtros de esta pestaña son independientes de los filtros predictivos del menú lateral.")
     try:
@@ -235,7 +507,7 @@ with t0:
         st.info("No hay créditos con los filtros seleccionados.")
     st.caption("La variable original 'probabilidad_incumplimiento' no se presenta como predicción futura del MPRH. Los créditos excluidos no reciben automáticamente una puntuación experimental.")
 
-with t1:
+if pagina == 'Resumen MPRH':
     a,b,c,dcol = st.columns(4)
     a.metric("Créditos visibles", f"{len(d):,}")
     b.metric("Nivel alto", f"{(d.nivel_experimental=='Alto').sum():,}")
@@ -262,12 +534,12 @@ with t1:
         resumen["frecuencia_simulada_%"] = (100 * resumen["eventos"] / resumen["creditos"].replace(0, float("nan"))).round(2)
         st.dataframe(resumen.reset_index().rename(columns={"nivel_experimental":"Nivel", "creditos":"Créditos", "eventos":"Eventos simulados", "frecuencia_simulada_%":"Frecuencia simulada (%)"}), hide_index=True, use_container_width=True)
     st.caption("Las frecuencias son de eventos simulados. El conjunto de prueba se ha utilizado previamente en análisis exploratorios.")
-with t2:
+if pagina == 'Explorador':
     st.subheader("Explorador de cartera")
     cols = ["id_credito","alcaldia","institucion","meses_atraso","carga_pago_pct","puntuacion_experimental","nivel_experimental","etiqueta_simulada"]
     st.dataframe(d[cols].sort_values("puntuacion_experimental", ascending=False), use_container_width=True, hide_index=True)
     st.download_button("Exportar vista filtrada (CSV)", data=d[cols].to_csv(index=False).encode("utf-8-sig"), file_name=f"SIGERH_{escenario}_{conjunto}_filtrado.csv", mime="text/csv")
-with t3:
+if pagina == 'Ficha de crédito':
     if d.empty:
         st.info("No hay créditos con los filtros seleccionados.")
     else:
@@ -284,7 +556,40 @@ with t3:
         st.write({"Alcaldía": r.alcaldia, "Institución": r.institucion, "Meses de atraso inicial": r.meses_atraso, "Carga de pago (%)": r.carga_pago_pct, "Ingreso mensual (MXN)": r.ingreso_mensual_mxn, "Saldo actual (MXN)": r.saldo_actual_mxn})
         st.caption("Ficha descriptiva; no constituye recomendación de crédito ni reestructuración.")
 
-with t4:
+if pagina == 'Seguimiento individual':
+    st.subheader("Seguimiento individual y comparación de escenarios")
+    st.caption("Comparación transversal de un mismo crédito entre los escenarios simulados; los CSV no contienen una serie mensual histórica.")
+    disponibles=all_data[all_data.conjunto.eq(conjunto)]
+    ids=sorted(disponibles.id_credito.dropna().unique().tolist(),key=str)
+    if not ids:
+        st.info("No hay créditos disponibles en este conjunto.")
+    else:
+        credito=st.selectbox("Selecciona el identificador de crédito",ids,key="seguimiento_credito")
+        detalle=disponibles[disponibles.id_credito.eq(credito)].sort_values("escenario")
+        r=detalle.iloc[0]
+        p1,p2,p3=st.columns(3)
+        p1.metric("Alcaldía",str(r.alcaldia))
+        p2.metric("Institución",str(r.institucion))
+        p3.metric("Carga de pago",f"{float(r.carga_pago_pct):.1f}%" if pd.notna(r.carga_pago_pct) else "Sin dato")
+        st.markdown("#### Comparación experimental")
+        vista=detalle[["escenario","conjunto","nivel_experimental","puntuacion_experimental","etiqueta_simulada"]].copy()
+        st.dataframe(vista,use_container_width=True,hide_index=True)
+        fig=go.Figure(go.Bar(x=detalle.escenario.str.title(),y=detalle.puntuacion_experimental,
+            marker_color=["#760E30" if s=="variable" else "#83B796" for s in detalle.escenario],
+            text=[f"{v:.3f}" for v in detalle.puntuacion_experimental],textposition="outside"))
+        preparar_figura(fig,altura=320)
+        fig.update_yaxes(range=[0,max(.1,float(detalle.puntuacion_experimental.max())*1.25)],title="Puntuación experimental")
+        st.plotly_chart(fig,use_container_width=True)
+        st.markdown("#### Perfil financiero registrado")
+        f1,f2,f3=st.columns(3)
+        f1.metric("Ingreso mensual (MXN)",f"${float(r.ingreso_mensual_mxn):,.0f}" if pd.notna(r.ingreso_mensual_mxn) else "Sin dato")
+        f2.metric("Pago mensual (MXN)",f"${float(r.pago_mensual_mxn):,.0f}" if pd.notna(r.pago_mensual_mxn) else "Sin dato")
+        f3.metric("Saldo actual (MXN)",f"${float(r.saldo_actual_mxn):,.0f}" if pd.notna(r.saldo_actual_mxn) else "Sin dato")
+        st.download_button("Descargar ficha comparativa (CSV)",data=detalle.to_csv(index=False).encode("utf-8-sig"),
+            file_name=f"SIGERH_ficha_{credito}_{conjunto}.csv",mime="text/csv",key="descarga_seguimiento")
+        st.info("La comparación muestra resultados de dos supuestos simulados, no evolución temporal ni recomendación financiera.")
+
+if pagina == 'Análisis por alcaldía':
     st.subheader("Análisis comparativo por alcaldía")
     st.caption("Resultados descriptivos de créditos simulados, sujetos a los filtros de la barra lateral. No representan riesgo hipotecario real de las alcaldías.")
     if d.empty:
@@ -337,6 +642,16 @@ with t4:
                 st.subheader("Frecuencia de incumplimiento simulado por alcaldía")
                 st.plotly_chart(grafico_horizontal(comparables,"frecuencia_simulada_pct","alcaldia",VERDE,"%",altura=530),use_container_width=True)
             st.caption("Las diferencias pueden deberse a la composición de los datos simulados y al tamaño de cada grupo; no establecen causalidad ni comparaciones poblacionales representativas.")
+        st.subheader("Lectura territorial automática")
+        if not tabla.empty:
+            mayor_volumen = tabla.sort_values("creditos", ascending=False).iloc[0]
+            st.markdown(f"**Mayor volumen:** {mayor_volumen['alcaldia']} reúne **{int(mayor_volumen['creditos']):,} créditos** del conjunto filtrado. La cantidad absoluta no equivale a una mayor tasa de nivel Alto.")
+            if not comparables.empty:
+                mayor_proporcion = comparables.sort_values(["porcentaje_alto", "creditos"], ascending=[False,False]).iloc[0]
+                st.markdown(f"**Mayor proporción de nivel Alto entre alcaldías con al menos {minimo:,} créditos:** {mayor_proporcion['alcaldia']}, con **{mayor_proporcion['porcentaje_alto']:.2f}%** ({int(mayor_proporcion['Alto']):,} de {int(mayor_proporcion['creditos']):,} créditos).")
+            else:
+                st.info("Ninguna alcaldía alcanza el mínimo de registros para la comparación de proporciones.")
+            st.caption("Lectura descriptiva de datos simulados. No constituye una clasificación del riesgo real por alcaldía ni demuestra relaciones causales.")
         st.subheader("Tabla comparativa descargable")
         vista = tabla.rename(columns={
             "alcaldia": "Alcaldía", "creditos": "Créditos", "eventos_simulados": "Eventos simulados",
@@ -361,7 +676,7 @@ with t4:
         st.caption("Cobertura limitada a los créditos de validación o prueba con puntuaciones disponibles. No incluye todos los 100,000 registros originales.")
 
 
-with t5:
+if pagina == 'Análisis financiero':
     st.subheader("Análisis financiero de la cartera simulada")
     st.caption("Estadísticas descriptivas de los créditos visibles con los filtros actuales. Los importes son pesos mexicanos (MXN). No constituyen asesoría financiera ni estimaciones de riesgo real.")
     if d.empty:
@@ -459,7 +774,7 @@ with t5:
         st.caption("Las diferencias entre niveles o alcaldías son asociaciones descriptivas dentro de datos simulados. No prueban causalidad ni permiten inferencias sobre la población real de Ciudad de México.")
 
 
-with t6:
+if pagina == 'Comparación de escenarios':
     st.subheader("Comparación de escenarios del MPRH")
     st.caption("Se comparan los mismos créditos en los escenarios variable y persistente. Las etiquetas y puntuaciones son experimentales, no predicciones validadas sobre una cartera real.")
     st.info("Los filtros de alcaldía, institución e ID se aplican a ambos escenarios. Si seleccionaste niveles en la barra lateral, se interpretan respecto al escenario activo para evitar mezclar criterios.")
@@ -545,7 +860,7 @@ with t6:
             file_name=f"SIGERH_comparacion_escenarios_{conjunto}.csv", mime="text/csv")
         st.caption("Resultados exploratorios de una simulación. No interpretarlos como efectos causales ni utilizarlos para decisiones crediticias reales.")
 
-with t7:
+if pagina == 'Metodología':
     st.subheader("Alcance del prototipo")
     st.markdown("""**Origen:** cartera de 100,000 créditos simulados. El MPRH genera etiquetas experimentales de incumplimiento a seis meses bajo dos escenarios.
 
@@ -558,3 +873,18 @@ with t7:
 **Comparación de escenarios:** se emparejan los mismos créditos por identificador y conjunto; se comparan etiquetas, puntuaciones y niveles simulados. Las diferencias no son efectos causales de intervenciones ni probabilidades de incumplimiento real.
 
 **Limitaciones:** la evaluación de prueba fue utilizada exploratoriamente en etapas anteriores; no constituye validación independiente. Las puntuaciones no están calibradas contra incumplimientos reales. No utilizar para otorgar, rechazar o reestructurar créditos.""")
+
+
+# Módulos independientes incorporados desde SIGERH IA.
+# Se conserva el MPRH original sin modificar sus clasificaciones.
+if pagina in {"Chatbot hipotecario", "Clasificador experimental", "Simulador financiero"}:
+    from modulos_ia import chatbot, prediccion, simulador
+    st.info("Herramientas académicas basadas en datos sintéticos. El clasificador independiente no equivale al MPRH a seis meses ni genera probabilidades calibradas de incumplimiento real.")
+    if pagina == "Simulador financiero":
+        simulador()
+    else:
+        cartera_ia = cargar_cartera_completa(str(base_file))
+        if pagina == "Chatbot hipotecario":
+            chatbot(cartera_ia, d, escenario, conjunto)
+        elif pagina == "Clasificador experimental":
+            prediccion(cartera_ia)
